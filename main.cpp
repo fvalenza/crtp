@@ -1,35 +1,8 @@
-
-// #include <iostream>
-// using namespace std;
-
-// template <typename Child>
-// struct Base
-// {
-//     void interface()
-//     {
-//         static_cast<Child*>(this)->implementation();
-//     }
-// };
-
-// struct Derived : Base<Derived>
-// {
-//     void implementation()
-//     {
-//         cerr << "Derived implementation\n";
-//     }
-// };
-
-// int main()
-// {
-//     Derived d;
-//     d.interface();  // Prints "Derived implementation"
-// }
 #include <iostream>
 #include "include/skew.hpp"
-#include "crtp-base-interface.hpp"
-// #include "include/SE3.hpp"
-// ##include "include/force6d.hpp"
-// #include "include/SE3all.hpp"
+// #include "crtp-base-interface.hpp"
+// #include "crtp-traits-interface.hpp"
+#include "include/se3all-crtp.hpp"
 // #include "include/forceall.hpp"
 // #include "include/inertiaall.hpp"
 // #include "include/motionall.hpp"
@@ -45,8 +18,10 @@
 // #define BOOST_VARIANT_LIMIT_TYPES 150 //http://www.boost.org/doc/libs/1_53_0/doc/html/BOOST_VARIANT_LIMIT_TYPES.html  std::cout << BOOST_VARIANT_LIMIT_TYPES << std::endl;  DEFAULT : 20
 int main()
 {
+  // using namespace se3;
+
   Derived<double,0> t;
   new_type tt;
-  
+
   return 0;
 }
