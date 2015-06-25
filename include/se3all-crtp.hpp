@@ -25,8 +25,7 @@ namespace se3
    * where aAB is the vector from origin A to origin B expressed in coordinates A.
    */
 
-   template<class C> struct traits {};
-  
+     
 
     template< class Derived>
     class SE3Base

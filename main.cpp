@@ -3,7 +3,7 @@
 // #include "crtp-base-interface.hpp"
 // #include "crtp-traits-interface.hpp"
 #include "include/se3all-crtp.hpp"
-// #include "include/forceall.hpp"
+#include "include/forceall-crtp.hpp"
 // #include "include/inertiaall.hpp"
 // #include "include/motionall.hpp"
 // #include <boost/variant/variant_fwd.hpp>
@@ -22,6 +22,9 @@ int main()
 
   SE3Tpl<double,0> t;
   SE3d tt;
+
+  ForceTpl<double,0> f;
+  Forced ff;
 
   return 0;
 }
