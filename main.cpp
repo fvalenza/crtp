@@ -18,10 +18,10 @@
 // #define BOOST_VARIANT_LIMIT_TYPES 150 //http://www.boost.org/doc/libs/1_53_0/doc/html/BOOST_VARIANT_LIMIT_TYPES.html  std::cout << BOOST_VARIANT_LIMIT_TYPES << std::endl;  DEFAULT : 20
 int main()
 {
-  // using namespace se3;
+  using namespace se3;
 
-  Derived<double,0> t;
-  new_type tt;
+  SE3Tpl<double,0> t;
+  SE3d tt;
 
   return 0;
 }
