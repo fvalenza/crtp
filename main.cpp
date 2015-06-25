@@ -4,8 +4,8 @@
 // #include "crtp-traits-interface.hpp"
 #include "include/se3all-crtp.hpp"
 #include "include/forceall-crtp.hpp"
+#include "include/motionall-crtp.hpp"
 // #include "include/inertiaall.hpp"
-// #include "include/motionall.hpp"
 // #include <boost/variant/variant_fwd.hpp>
 
 // #include "force-base.hpp" 
@@ -19,12 +19,18 @@
 int main()
 {
   using namespace se3;
+  using namespace std;
 
   SE3Tpl<double,0> t;
-  SE3d tt;
+  SE3d tt(t);
+  cout << t << endl;
+  cout << tt << endl;
 
   ForceTpl<double,0> f;
   Forced ff;
+
+  MotionTpl<double,0> m;
+  Motiond mm;
 
   return 0;
 }
