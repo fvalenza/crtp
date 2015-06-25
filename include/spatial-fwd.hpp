@@ -8,7 +8,7 @@ namespace se3
   template<typename _Scalar, int _Options=0> class SE3Tpl;
   template<typename _Scalar, int _Options=0> class MotionTpl;
   template<typename _Scalar, int _Options=0> class ForceTpl;
-  // template<typename _Scalar, int _Options=0> class InertiaTpl;
+  template<typename _Scalar, int _Options=0> class InertiaTpl;
 
   template<class C> struct traits {};
 

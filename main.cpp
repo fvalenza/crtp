@@ -5,7 +5,7 @@
 #include "include/se3all-crtp.hpp"
 #include "include/forceall-crtp.hpp"
 #include "include/motionall-crtp.hpp"
-// #include "include/inertiaall.hpp"
+#include "include/inertiaall-crtp.hpp"
 // #include <boost/variant/variant_fwd.hpp>
 
 // #include "force-base.hpp" 
@@ -27,10 +27,13 @@ int main()
   cout << tt << endl;
 
   ForceTpl<double,0> f;
-  Forced ff;
+  Forced ff(f);
 
   MotionTpl<double,0> m;
-  Motiond mm;
+  Motiond mm(m);
+
+  InertiaTpl<double, 0> i;
+  Inertiad ii(i);
 
   return 0;
 }
