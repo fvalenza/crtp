@@ -2,6 +2,24 @@
 #define _se3_all_hpp
 
 #include "spatial-fwd.hpp"
+
+
+
+#define SPATIAL_SE3_TYPEDEF_ARG(policy)              \
+  typedef typename traits<policy>::Vector3 Vector3; \
+  typedef typename traits<policy>::Vector4 Vector4; \
+  typedef typename traits<policy>::Vector6 Vector6; \
+  typedef typename traits<policy>::Matrix3 Matrix3; \
+  typedef typename traits<policy>::Matrix4 Matrix4; \
+  typedef typename traits<policy>::Matrix6 Matrix6; \
+  typedef typename traits<policy>::Angular_t Angular_t; \
+  typedef typename traits<policy>::Linear_t Linear_t; \
+  typedef typename traits<policy>::Quaternion_t Quaternion_t; \
+  enum {  \
+    LINEAR = traits<policy>::LINEAR,  \
+    ANGULAR = traits<policy>::ANGULAR   \
+  }
+
 namespace se3
 {
 
@@ -34,24 +52,52 @@ namespace se3
     
 
       typedef Derived  Derived_t;
-      typedef typename traits<Derived_t>::Angular_t Angular_t;
-      typedef typename traits<Derived_t>::Linear_t Linear_t;
+      SPATIAL_SE3_TYPEDEF_ARG(Derived_t);
+
 
     public:
       Derived_t & derived() { return *static_cast<Derived_t*>(this); }
       const Derived_t& derived() const { return *static_cast<const Derived_t*>(this); }
 
-      const Angular_t & rotation() const  { return static_cast<const Derived_t*>(this)->rotation(); }
-      const Linear_t & translation() const  { return static_cast<const Derived_t*>(this)->translation(); }
-      Angular_t & rotation()  { return static_cast<Derived_t*>(this)->rotation(); }
-      Linear_t & translation()   { return static_cast<Derived_t*>(this)->translation(); }
-      void rotation(const Angular_t & R) { static_cast< Derived_t*>(this)->rotation(R); }
-      void translation(const Linear_t & R) { static_cast< Derived_t*>(this)->translation(R); }
+      const Angular_t & rotation() const  { std::cout << "hello" << std::endl; return derived().rotation_impl(); }
+      const Linear_t & translation() const  { return derived().translation_impl(); }
+      Angular_t & rotation()  { return derived().rotation_impl(); }
+      Linear_t & translation()   { return derived().translation_impl(); }
+      void rotation(const Angular_t & R) { derived().rotation_impl(R); }
+      void translation(const Linear_t & R) { derived().translation_impl(R); }
+
+
+      //  Unable to change this with Matrix4 toHomogen...
+      Matrix4 toHomogeneousMatrix() const
+      {
+        std::cout << "2Homo base" << std::endl;
+        return derived().toHomogeneousMatrix_impl();
+      }
+      operator Matrix4() const { return toHomogeneousMatrix(); }
+
+      Matrix6 toActionMatrix() const
+      {
+        std::cout << "2Action base" << std::endl;
+        return derived().toActionMatrix_impl();
+      }
+      operator Matrix6() const { return toActionMatrix(); }
+
+
+      void disp(std::ostream & os) const
+      {
+        os << "base disp" << std::endl;
+        static_cast<const Derived_t*>(this)->disp_impl(os);
+      }
+
+      friend std::ostream & operator << (std::ostream & os,const SE3Base<Derived> & X)
+      { 
+        os << "base <<" << std::endl;
+        X.disp(os);
+        return os;//X.disp(os); return os;
+      }
 
     };
 
-
-    // template <typename, int> class SE3; // class Derived exists.
 
     template<typename T, int U>
     struct traits< SE3Tpl<T, U> >
@@ -64,7 +110,7 @@ namespace se3
       typedef Eigen::Matrix<T,6,6,U> Matrix6;
       typedef Matrix3 Angular_t;
       typedef Vector3 Linear_t;
-      typedef Eigen::Quaternion<T,U> Quaternion;
+      typedef Eigen::Quaternion<T,U> Quaternion_t;
       enum {
         LINEAR = 0,
         ANGULAR = 3
@@ -76,20 +122,9 @@ namespace se3
     class SE3Tpl : public SE3Base< SE3Tpl< _Scalar, _Options > >
     {
 
-      // These typename can be put in a Macro ( see joint-base)
-      typedef typename traits<SE3Tpl>::Vector3 Vector3;
-      typedef typename traits<SE3Tpl>::Vector4 Vector4;
-      typedef typename traits<SE3Tpl>::Vector6 Vector6;
-      typedef typename traits<SE3Tpl>::Matrix3 Matrix3;
-      typedef typename traits<SE3Tpl>::Matrix4 Matrix4;
-      typedef typename traits<SE3Tpl>::Matrix6 Matrix6;
-      typedef typename traits<SE3Tpl>::Angular_t Angular_t;
-      typedef typename traits<SE3Tpl>::Linear_t Linear_t;
-      typedef typename traits<SE3Tpl>::Quaternion Quaternion_t;
-      enum {
-        LINEAR = traits<SE3Tpl>::LINEAR,
-        ANGULAR = traits<SE3Tpl>::ANGULAR 
-      };
+    private:
+      friend class SE3Base< SE3Tpl< _Scalar, _Options > >;
+      SPATIAL_SE3_TYPEDEF_ARG(SE3Tpl);
 
 
     public:
@@ -144,39 +179,43 @@ namespace se3
         return *this;
       }
 
+    private:
       //  Unable to change this with Matrix4 toHomogen...
-      Eigen::Matrix<double,4,4,0> toHomogeneousMatrix() const
+      Matrix4 toHomogeneousMatrix_impl() const
       {
-        Eigen::Matrix<double,4,4,0> M;
-        M.block<3,3>(0,0) = rot;
-        M.block<3,1>(0,3) = trans;
-        M.block<1,3>(3,0).setZero();
+        std::cout << "2Homo derived" << std::endl;
+        Matrix4 M;
+        M.template block<3,3>(LINEAR,LINEAR) = rot;
+        M.template block<3,1>(LINEAR,ANGULAR) = trans;
+        M.template block<1,3>(ANGULAR,LINEAR).setZero();
         M(3,3) = 1;
         return M;
       }
 
       /// Vb.toVector() = bXa.toMatrix() * Va.toVector()
-      Matrix6 toActionMatrix() const
+      Matrix6 toActionMatrix_impl() const
       {
         Matrix6 M;
-        M.block<3,3>(ANGULAR,ANGULAR)
-        = M.block<3,3>(LINEAR,LINEAR) = rot;
-        M.block<3,3>(ANGULAR,LINEAR).setZero();
-        M.block<3,3>(LINEAR,ANGULAR)
-        = skew(trans) * M.block<3,3>(ANGULAR,ANGULAR);
+        M.template block<3,3>(ANGULAR,ANGULAR)
+        = M.template block<3,3>(LINEAR,LINEAR) = rot;
+        M.template block<3,3>(ANGULAR,LINEAR).setZero();
+        M.template block<3,3>(LINEAR,ANGULAR)
+        = skew(trans) * M.template block<3,3>(ANGULAR,ANGULAR);
         return M;
       }
 
-      void disp(std::ostream & os) const
+      void disp_impl(std::ostream & os) const
       {
+        os << "SE3Tpl disp" << std::endl;
         os << "  R =\n" << rot << std::endl
         << "  p = " << trans.transpose() << std::endl;
       }
 
       /// --- GROUP ACTIONS ON M6, F6 and I6 --- 
-
+public: //TODO act
      /// ay = aXb.act(by)
-      template<typename D> typename internal::ActionReturn<D>::Type act   (const D & d) const 
+      template<typename D>
+      typename internal::ActionReturn<D>::Type act   (const D & d) const 
       { 
         return d.se3Action(*this);
       }
@@ -186,6 +225,7 @@ namespace se3
         return d.se3ActionInverse(*this);
       }
 
+public: // TODO
       Vector3 act   (const Vector3& p) const { return (rot*p+trans).eval(); }
       Vector3 actInv(const Vector3& p) const { return (rot.transpose()*(p-trans)).eval(); }
 
@@ -193,22 +233,26 @@ namespace se3
       SE3Tpl actInv (const SE3Tpl& m2) const { return SE3Tpl( rot.transpose()*m2.rot, rot.transpose()*(m2.trans-trans));}
 
       /// Operators 
-      operator Matrix4() const { return toHomogeneousMatrix(); }
-      operator Matrix6() const { return toActionMatrix(); }
+      // operator Matrix4() const { return toHomogeneousMatrix(); }
+      // operator Matrix6() const { return toActionMatrix(); }
 
-      friend std::ostream & operator << (std::ostream & os,const SE3Tpl & X)
-      { X.disp(os); return os; }
+      // friend std::ostream & operator << (std::ostream & os,const SE3Tpl & X)
+      // { 
+      //   os << "derived <<" << std::endl;
+      //   return os;
+      //   // X.disp(os); return os;
+      // }
 
       SE3Tpl operator*(const SE3Tpl & m2) const    { return this->act(m2); }
 
 
-
-      const Angular_t & rotation() const { return rot; }
-      Angular_t & rotation() { return rot; }
-      void rotation(const Angular_t & R) { rot = R; }
-      const Linear_t & translation() const { return trans;}
-      Linear_t & translation() { return trans;}
-      void translation(const Linear_t & p) { trans=p; }
+    private:
+      const Angular_t & rotation_impl() const { return rot; }
+      Angular_t & rotation_impl() { return rot; }
+      void rotation_impl(const Angular_t & R) { rot = R; }
+      const Linear_t & translation_impl() const { return trans;}
+      Linear_t & translation_impl() { return trans;}
+      void translation_impl(const Linear_t & p) { trans=p; }
 
     protected:
       Angular_t rot;

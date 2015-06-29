@@ -243,8 +243,57 @@ namespace se3
     ForceTpl<S,O> operator^( const MotionTpl<S,O> &m, const ForceTpl<S,O> &f ) { return m.cross(f); }
 
 
-typedef MotionTpl<double,0> Motiond;
 
+    typedef MotionTpl<double,0> Motiond;
+
+    // template<typename _Scalar, int _Options>
+    // class NeutralMotion : public MotionBase< NeutralMotion<  _Scalar, _Options > >
+    // {
+    // public:
+
+    //   typedef Eigen::Matrix<_Scalar, 3, 1, _Options> Vector3;
+
+    //   NeutralMotion(){};
+
+    //   const Angular_t & angular() const
+    //   {
+    //     assert(false &&  "Error, no angular part");
+    //     return Vector3::Zero(); // should be a type defined
+    //   }
+    //   Angular_t & angular()
+    //   {
+    //     assert(false &&  "Error, no angular part");
+    //     return Vector3::Zero();
+    //   }
+    //   void angular(const Angular_t & R)
+    //   {  
+    //     assert(false &&  "Error, no angular part");
+    //   }
+    //   const Linear_t & linear() const
+    //   {
+    //     assert(false &&  "Error, no linear part");
+    //     return Vector3::Zero();
+    //   }
+    //   Linear_t & linear()
+    //   { 
+    //     assert(false &&  "Error, no linear part");
+    //     return Vector3::Zero();
+    //   }
+    //   void linear(const Linear_t & p)
+    //   { 
+    //     assert(false &&  "Error, no linear part");
+    //   }
+
+
+    //   operator MotionTpl<_Scalar, _Options> () const { return MotionTpl<_Scalar, _Options>::Zero(); }
+    // };
+
+    // template<typename D, typename T, int U>
+    // const D & operator+ ( const D& v, const NeutralMotion<T,U>&) { return v; }
+    // template<typename D, typename T, int U>
+    // const D & operator+ ( const NeutralMotion<T,U>&,const D& v) { return v; }
+
+    // typedef NeutralMotion<double,0> ZeroMotion;
 }
 
 #endif //ifndef __motion_all_hpp__

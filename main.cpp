@@ -20,20 +20,28 @@ int main()
 {
   using namespace se3;
   using namespace std;
-
+  typedef traits<SE3d>::Vector3 Vector3;
+  typedef traits<SE3d>::Matrix4 Matrix4;
+  typedef traits<SE3d>::Matrix6 Matrix6;
   SE3Tpl<double,0> t;
-  SE3d tt(t);
-  cout << t << endl;
-  cout << tt << endl;
+  Vector3 p(Vector3::Random());
+  cout << p <<endl;
+    // SE3d tt(t);
+  // cout << t.rotation_int() << endl;
+  // cout << (Matrix4)t << endl;
+  // std::cout << t.toHomogeneousMatrix() << std::endl;;
+  // cout << (Matrix6)t << endl;
+  // std::cout << t.toActionMatrix() << std::endl;;
+  // std::cout << (SE3d::Matrix4) t << std::endl;;
 
-  ForceTpl<double,0> f;
-  Forced ff(f);
+  // ForceTpl<double,0> f;
+  // Forced ff(f);
 
-  MotionTpl<double,0> m;
-  Motiond mm(m);
+  // MotionTpl<double,0> m;
+  // Motiond mm(m);
 
-  InertiaTpl<double, 0> i;
-  Inertiad ii(i);
+  // InertiaTpl<double, 0> i;
+  // Inertiad ii(i);
 
   return 0;
 }
